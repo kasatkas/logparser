@@ -34,7 +34,7 @@ if os.path.isdir(path):
     result = open(argp.output, 'a+')
     for fileName in glob.glob(os.path.join(path, '*.log')):
             findString(fileName, argp.find)
-    
+    result.close()
 elif os.path.isfile(path):
     result = open(argp.output, 'w+')
     findString(path, argp.find)
