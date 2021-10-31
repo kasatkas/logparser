@@ -1,3 +1,5 @@
+import os,glob, argparse
+
 def progressBar(iterable, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
     total = len(iterable)
     def printProgressBar (iteration):
@@ -11,27 +13,31 @@ def progressBar(iterable, prefix = '', suffix = '', decimals = 1, length = 100, 
         printProgressBar(i + 1)
     print()
 
-import sys,os,glob
-path = sys.argv[1]
-stringToFind = sys.argv[2]
-resultFile =  "E:/result.log"
+parse = argparse.ArgumentParser(add_help=False)
+parse.add_argument('-h', '--help', action='help', help='Print this help message and exit')
+parse.add_argument('-p', '--path', help='Read file or folder')
+parse.add_argument('-f', '--find', help='Search strings')
+parse.add_argument('-o', '--output', default='result.txt', help=f'File to write. Default=result.txt')
+argp = parse.parse_args()
 
-def findString(file, str, mode):
-    result = open(resultFile, mode)
-    inp = file.readlines()
-    for i in progressBar(inp, prefix = 'Progress of ' + file.name, suffix = 'Complete', length = 50):
-        if str in i:
-            result.write(i + "\n")
-    result.close()
-    
+
+def findString(fileName, str):
+    with open(fileName, 'r') as file:
+        inp = file.readlines()
+        for i in progressBar(inp, prefix = 'Progress of ' + fileName, suffix = 'Complete', length = 50):
+            if str in i:
+                result.write(i + "\n")
+        file.close()
+
+path = argp.path
 if os.path.isdir(path):
+    result = open(argp.output, 'a+')
     for fileName in glob.glob(os.path.join(path, '*.log')):
-        with open(fileName, 'r') as f:
-            findString(f, stringToFind, 'a+')
-            f.close()
+            findString(fileName, argp.find)
+    
 elif os.path.isfile(path):
-    with open(path, 'r') as f:
-        findString(f, stringToFind, 'w+')
-        f.close()
+    result = open(argp.output, 'w+')
+    findString(path, argp.find)
+    result.close()
 else: 
     print('Wrong arg!')
